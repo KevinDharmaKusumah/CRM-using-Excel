@@ -1,0 +1,99 @@
+--------------------------------------
+FORM SALES : EXCEL & VBA TUTORIAL
+--------------------------------------
+Option Explicit
+Private Sub CMDADD_Click()
+'Perintah membuat nama tempat simpan data
+Dim DBPERORANGAN As Object
+'Perintah menentukan tempat simpan data
+Set DBPERORANGAN = Sheet8.Range("A800000").End(xlUp)
+'Perintah menentukan data yang wajib diisi
+If Me.TXTNAMASALES.Value = "" _
+Or Me.TXTNO.Value = "" Then
+
+'Perintah membuat pesan jika data kosong
+Call MsgBox("Harap isi data dengan lengkap", vbInformation, "Input Data")
+'Perintah menyimpan data jika data diisi lengkap
+Else
+DBPERORANGAN.Offset(1, 0).Value = "=ROW()-ROW($A$7)"
+DBPERORANGAN.Offset(1, 1).Value = Me.TXTNAMASALES.Value
+DBPERORANGAN.Offset(1, 2).Value = Me.TXTNO.Value
+
+Call AmbilData
+Call MsgBox("Data berhasil disimpan", vbInformation, "Input Data")
+
+'Perintah membersihkan Form setelah data berhasil disimpan
+Me.TXTNAMASALES.Value = ""
+Me.TXTNO.Value = ""
+
+End If
+End Sub
+
+Private Sub CMDDELETE_Click()
+Application.ScreenUpdating = False
+Dim HapusData As Object
+Set HapusData = Sheet8.Range("A8:A100000").Find(WHAT:=Me.TXTNOMOR.Value, LookIn:=xlValues)
+
+If Me.TXTNOMOR.Value = "" Then
+Call MsgBox("Pilih data pada tabel data", vbInformation, "Hapus Data")
+Else
+'Membuat pesan konfirmasi hapus data
+Select Case MsgBox("Anda akan menghapus data" _
+& vbCrLf & "Apakah anda yakin?" _
+, vbYesNo Or vbQuestion Or vbDefaultButton1, "Hapus data")
+Case vbNo
+Exit Sub
+Case vbYes
+End Select
+Me.TABELDATA.Value = ""
+Sheet8.Select
+Selection.EntireRow.Delete
+Me.TXTNOMOR.Value = ""
+Call AmbilData
+Call MsgBox("Data berhasil dihapus", vbInformation, "Hapus Data")
+Me.CMDADD.Enabled = True
+Me.TXTNAMASALES.Value = ""
+Me.TXTNO.Value = ""
+
+End If
+
+End Sub
+
+Private Sub AmbilData()
+Dim DBSUPPLIER As Long
+Dim irow As Long
+irow = Sheet8.Range("A" & Rows.Count).End(xlUp).Row
+DBSUPPLIER = Application.WorksheetFunction.CountA(Sheet8.Range("A8:A100000"))
+If DBSUPPLIER = 0 Then
+FORMSALES.TABELDATA.RowSource = ""
+Else
+FORMSALES.TABELDATA.RowSource = "SALES!A8:C" & irow
+End If
+End Sub
+
+Private Sub TABELDATA_Click()
+On Error GoTo EXCELVBA
+Application.ScreenUpdating = False
+
+Dim SUMBERUBAH, CELLAKTIF As String
+Me.TXTNOMOR.Value = Me.TABELDATA.Value
+Me.TXTNAMASALES.Value = Me.TABELDATA.Column(1)
+Me.TXTNO.Value = Me.TABELDATA.Column(2)
+
+Me.CMDADD.Enabled = False
+
+Sheet8.Select
+SUMBERUBAH = Sheets("SALES").Cells(Rows.Count, "A").End(xlUp).Row
+Sheets("SALES").Range("A8:A" & SUMBERUBAH).Find(WHAT:=Me.TXTNOMOR.Value, LookIn:=xlValues, LookAt:=xlWhole).Activate
+CELLAKTIF = ActiveCell.Row
+Sheet8.Select
+Exit Sub
+EXCELVBA:
+Call MsgBox("Harap pilih data pada tabel data", vbInformation, "Pilih Data")
+
+End Sub
+
+
+Private Sub UserForm_Initialize()
+Call AmbilData
+End Sub

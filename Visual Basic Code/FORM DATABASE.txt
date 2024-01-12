@@ -1,0 +1,387 @@
+--------------------------------------
+FORM DATABASE: EXCEL & VBA TUTORIAL
+--------------------------------------
+
+Option Explicit
+
+Private Sub AmbilTanggal()
+Dim DPENJUALAN As Long
+Dim irow As Long
+irow = Sheet6.Range("B" & Rows.Count).End(xlUp).Row
+DPENJUALAN = Application.WorksheetFunction.CountA(Sheet6.Range("B3:B33"))
+If DPENJUALAN = 0 Then
+FORMDATABASE.CMBTANGGAL.RowSource = ""
+Else
+FORMDATABASE.CMBTANGGAL.RowSource = "TANGGAL!B3:B" & irow
+End If
+End Sub
+Private Sub AmbilBulan()
+Dim DPENJUALAN As Long
+Dim irow As Long
+irow = Sheet6.Range("D" & Rows.Count).End(xlUp).Row
+DPENJUALAN = Application.WorksheetFunction.CountA(Sheet6.Range("D3:D16"))
+If DPENJUALAN = 0 Then
+FORMDATABASE.CMBBULAN.RowSource = ""
+Else
+FORMDATABASE.CMBBULAN.RowSource = "TANGGAL!D3:D" & irow
+End If
+End Sub
+Private Sub AmbilTahun()
+Dim DPENJUALAN As Long
+Dim irow As Long
+irow = Sheet6.Range("F" & Rows.Count).End(xlUp).Row
+DPENJUALAN = Application.WorksheetFunction.CountA(Sheet6.Range("F3:F13"))
+If DPENJUALAN = 0 Then
+FORMDATABASE.CMBTAHUN.RowSource = ""
+Else
+FORMDATABASE.CMBTAHUN.RowSource = "TANGGAL!F3:F" & irow
+End If
+End Sub
+
+Private Sub CBCUSTOMER_Change()
+If Me.CBCUSTOMER.Value = "Perorangan" Then
+Call AmbilPerorangan
+End If
+If Me.CBCUSTOMER.Value = "Perusahaan" Then
+Call AmbilCompanies
+End If
+End Sub
+Private Sub AmbilCompanies()
+Dim DBSUPPLIER As Long
+Dim irow As Long
+irow = Sheet3.Range("B" & Rows.Count).End(xlUp).Row
+DBSUPPLIER = Application.WorksheetFunction.CountA(Sheet3.Range("B8:B100000"))
+If DBSUPPLIER = 0 Then
+Me.TXTNAMA.RowSource = ""
+Else
+Me.TXTNAMA.RowSource = "COMPANIES!B8:B" & irow
+End If
+End Sub
+Private Sub AmbilPerorangan()
+Dim DBSUPPLIER As Long
+Dim irow As Long
+irow = Sheet2.Range("B" & Rows.Count).End(xlUp).Row
+DBSUPPLIER = Application.WorksheetFunction.CountA(Sheet2.Range("B8:B100000"))
+If DBSUPPLIER = 0 Then
+Me.TXTNAMA.RowSource = ""
+Else
+Me.TXTNAMA.RowSource = "PEOPLE!B8:B" & irow
+End If
+End Sub
+Private Sub CMBLAYANAN_Change()
+'perintah membuat sumber data pencarian
+On Error GoTo Salah
+Dim Sumberdata As Object
+Set Sumberdata = Sheet5.Range("B8:B1000000").Find(WHAT:=Me.CMBLAYANAN.Value, LookIn:=xlValues)
+Me.TXTHARGAMINIMAL.Value = Sumberdata.Offset(0, 1).Value
+
+Exit Sub
+Salah:
+Call MsgBox("Data tidak ditemukan", vbInformation, "Cari Data")
+
+End Sub
+
+
+
+Private Sub CMDADD_Click()
+'Perintah membuat nama tempat simpan data
+Dim DBCOMPANIES As Object
+'Perintah menentukan tempat simpan data
+Set DBCOMPANIES = Sheet4.Range("A800000").End(xlUp)
+'Perintah menentukan data yang wajib diisi
+If Me.CMBTANGGAL.Value = "" _
+Or Me.CMBBULAN.Value = "" _
+Or Me.CMBTAHUN.Value = "" _
+Or Me.TXTNAMA.Value = "" _
+Or Me.CBCUSTOMER.Value = "" _
+Or Me.TXTNOHP.Value = "" _
+Or Me.TXTALAMAT.Value = "" _
+Or Me.CMBLAYANAN.Value = "" _
+Or Me.TXTHARGAMINIMAL.Value = "" _
+Or Me.CMBSTATUS.Value = "" _
+Or Me.TXTKETERANGAN.Value = "" _
+Or Me.CMBSALES.Value = "" _
+Or Me.TXTTANGGALD.Value = "" _
+Or Me.TXTNILAI.Value = "" Then
+'Perintah membuat pesan jika data kosong
+Call MsgBox("Harap isi data dengan lengkap", vbInformation, "Input Data")
+'Perintah menyimpan data jika data diisi lengkap
+Else
+DBCOMPANIES.Offset(1, 0).Value = "=ROW()-ROW($A$7)"
+DBCOMPANIES.Offset(1, 1).Value = Me.CMBTANGGAL.Value
+DBCOMPANIES.Offset(1, 2).Value = Me.CMBBULAN.Value
+DBCOMPANIES.Offset(1, 3).Value = Me.CMBTAHUN.Value
+DBCOMPANIES.Offset(1, 4).Value = Me.TXTNAMA.Value
+DBCOMPANIES.Offset(1, 5).Value = Me.CBCUSTOMER.Value
+DBCOMPANIES.Offset(1, 6).Value = Me.TXTNOHP.Value
+DBCOMPANIES.Offset(1, 7).Value = Me.TXTALAMAT.Value
+DBCOMPANIES.Offset(1, 8).Value = Me.CMBLAYANAN.Value
+DBCOMPANIES.Offset(1, 9).Value = Me.TXTHARGAMINIMAL.Value
+DBCOMPANIES.Offset(1, 10).Value = Me.CMBSTATUS.Value
+DBCOMPANIES.Offset(1, 11).Value = Me.TXTKETERANGAN.Value
+DBCOMPANIES.Offset(1, 12).Value = Me.CMBSALES.Value
+DBCOMPANIES.Offset(1, 13).Value = Me.TXTTANGGALD.Value
+DBCOMPANIES.Offset(1, 14).Value = Me.TXTNILAI.Value
+Call AmbilData
+Call MsgBox("Data berhasil disimpan", vbInformation, "Input Data")
+'Perintah membersihkan Form setelah data berhasil disimpan
+Me.CMBTANGGAL.Value = ""
+Me.CMBBULAN.Value = ""
+Me.CMBTAHUN.Value = ""
+Me.TXTNAMA.Value = ""
+Me.CBCUSTOMER.Value = ""
+Me.TXTNOHP.Value = ""
+Me.TXTALAMAT.Value = ""
+Me.CMBLAYANAN.Value = ""
+Me.TXTHARGAMINIMAL.Value = ""
+Me.CMBSTATUS.Value = ""
+Me.TXTKETERANGAN.Value = ""
+Me.CMBSALES.Value = ""
+Me.TXTTANGGALD.Value = ""
+Me.TXTNILAI.Value = ""
+End If
+
+End Sub
+
+Private Sub CMDDELETE_Click()
+Application.ScreenUpdating = False
+Dim HapusData As Object
+Set HapusData = Sheet4.Range("A8:A100000").Find(WHAT:=Me.TXTNOMOR.Value, LookIn:=xlValues)
+
+If Me.TXTNOMOR.Value = "" Then
+Call MsgBox("Pilih data pada tabel data", vbInformation, "Hapus Data")
+Else
+'Membuat pesan konfirmasi hapus data
+Select Case MsgBox("Anda akan menghapus data" _
+& vbCrLf & "Apakah anda yakin?" _
+, vbYesNo Or vbQuestion Or vbDefaultButton1, "Hapus data")
+Case vbNo
+Exit Sub
+Case vbYes
+End Select
+Me.TABELDATA.Value = ""
+Sheet4.Select
+Selection.EntireRow.Delete
+Me.TXTNOMOR.Value = ""
+Call AmbilData
+Call MsgBox("Data berhasil dihapus", vbInformation, "Hapus Data")
+Me.CMDADD.Enabled = True
+
+Me.CMBTANGGAL.Value = ""
+Me.CMBBULAN.Value = ""
+Me.CMBTAHUN.Value = ""
+Me.TXTNAMA.Value = ""
+Me.CBCUSTOMER.Value = ""
+Me.TXTNOHP.Value = ""
+Me.TXTALAMAT.Value = ""
+Me.CMBLAYANAN.Value = ""
+Me.TXTHARGAMINIMAL.Value = ""
+Me.CMBSTATUS.Value = ""
+Me.TXTKETERANGAN.Value = ""
+Me.CMBSALES.Value = ""
+Me.TXTTANGGALD.Value = ""
+Me.TXTNILAI.Value = ""
+
+End If
+
+End Sub
+
+
+Private Sub CMDRESET_Click()
+Me.CMBTANGGAL.Value = ""
+Me.CMBBULAN.Value = ""
+Me.CMBTAHUN.Value = ""
+Me.TXTNAMA.Value = ""
+Me.CBCUSTOMER.Value = ""
+Me.TXTNOHP.Value = ""
+Me.TXTALAMAT.Value = ""
+Me.CMBLAYANAN.Value = ""
+Me.TXTHARGAMINIMAL.Value = ""
+Me.CMBSTATUS.Value = ""
+Me.TXTKETERANGAN.Value = ""
+Me.CMBSALES.Value = ""
+Me.TXTTANGGALD.Value = ""
+Me.TXTNILAI.Value = ""
+Me.CMDADD.Enabled = True
+Call AmbilData
+End Sub
+
+Private Sub CMDUPDATE_Click()
+Dim UPDATE As Object
+Set UPDATE = Sheet4.Range("A8:A100000").Find(WHAT:=Me.TXTNOMOR.Value, LookIn:=xlValues)
+If Me.TXTNOMOR.Value = "" Then
+Call MsgBox("Pilih data yang akan diupdate", vbInformation, "Update Data")
+Else
+UPDATE.Offset(0, 1).Value = Me.CMBTANGGAL.Value
+UPDATE.Offset(0, 2).Value = Me.CMBBULAN.Value
+UPDATE.Offset(0, 3).Value = Me.CMBTAHUN.Value
+UPDATE.Offset(0, 4).Value = Me.TXTNAMA.Value
+UPDATE.Offset(0, 5).Value = Me.CBCUSTOMER.Value
+UPDATE.Offset(0, 6).Value = Me.TXTNOHP.Value
+UPDATE.Offset(0, 7).Value = Me.TXTALAMAT.Value
+UPDATE.Offset(0, 8).Value = Me.CMBLAYANAN.Value
+UPDATE.Offset(0, 9).Value = Me.TXTHARGAMINIMAL.Value
+UPDATE.Offset(0, 10).Value = Me.CMBSTATUS.Value
+UPDATE.Offset(0, 11).Value = Me.TXTKETERANGAN.Value
+UPDATE.Offset(0, 12).Value = Me.CMBSALES.Value
+UPDATE.Offset(0, 13).Value = Me.TXTTANGGALD.Value
+UPDATE.Offset(0, 14).Value = Me.TXTNILAI.Value
+Call AmbilData
+Call MsgBox("Data produk berhasil diupdate", vbInformation, "Update Data")
+Me.CMDADD.Enabled = True
+
+Me.CMBTANGGAL.Value = ""
+Me.CMBBULAN.Value = ""
+Me.CMBTAHUN.Value = ""
+Me.TXTNAMA.Value = ""
+Me.CBCUSTOMER.Value = ""
+Me.TXTNOHP.Value = ""
+Me.TXTALAMAT.Value = ""
+Me.CMBLAYANAN.Value = ""
+Me.TXTHARGAMINIMAL.Value = ""
+Me.CMBSTATUS.Value = ""
+Me.TXTKETERANGAN.Value = ""
+Me.CMBSALES.Value = ""
+Me.TXTTANGGALD.Value = ""
+Me.TXTNILAI.Value = ""
+
+
+End If
+
+End Sub
+
+Private Sub TABELDATA_DblClick(ByVal Cancel As MSForms.ReturnBoolean)
+On Error GoTo EXCELVBA
+Application.ScreenUpdating = False
+Dim SUMBERUBAH, CELLAKTIF As String
+Me.TXTNOMOR.Value = Me.TABELDATA.Value
+Me.CMBTANGGAL.Value = Me.TABELDATA.Column(1)
+Me.CMBBULAN.Value = Me.TABELDATA.Column(2)
+Me.CMBTAHUN.Value = Me.TABELDATA.Column(3)
+Me.TXTNAMA.Value = Me.TABELDATA.Column(4)
+Me.CBCUSTOMER.Value = Me.TABELDATA.Column(5)
+Me.TXTNOHP.Value = Me.TABELDATA.Column(6)
+Me.TXTALAMAT.Value = Me.TABELDATA.Column(7)
+Me.CMBLAYANAN.Value = Me.TABELDATA.Column(8)
+Me.TXTHARGAMINIMAL.Value = Me.TABELDATA.Column(9)
+Me.CMBSTATUS.Value = Me.TABELDATA.Column(10)
+Me.TXTKETERANGAN.Value = Me.TABELDATA.Column(11)
+Me.CMBSALES.Value = Me.TABELDATA.Column(12)
+Me.TXTTANGGALD.Value = Me.TABELDATA.Column(13)
+Me.TXTNILAI.Value = Me.TABELDATA.Column(14)
+
+Me.CMDADD.Enabled = False
+
+Sheet4.Select
+SUMBERUBAH = Sheets("DATABASE").Cells(Rows.Count, "A").End(xlUp).Row
+Sheets("DATABASE").Range("A8:A" & SUMBERUBAH).Find(WHAT:=Me.TXTNOMOR.Value, LookIn:=xlValues, LookAt:=xlWhole).Activate
+CELLAKTIF = ActiveCell.Row
+Sheet1.Select
+Exit Sub
+EXCELVBA:
+Call MsgBox("Harap pilih data pada tabel data", vbInformation, "Pilih Data")
+
+End Sub
+
+Private Sub AmbilData()
+Dim DBSUPPLIER As Long
+Dim irow As Long
+irow = Sheet4.Range("A" & Rows.Count).End(xlUp).Row
+DBSUPPLIER = Application.WorksheetFunction.CountA(Sheet4.Range("A8:A100000"))
+If DBSUPPLIER = 0 Then
+FORMDATABASE.TABELDATA.RowSource = ""
+Else
+FORMDATABASE.TABELDATA.RowSource = "DATABASE!A8:O" & irow
+End If
+End Sub
+
+Private Sub TXTCARI_Change()
+On Error GoTo Salah
+Dim irow As Long
+Dim DCARIDATA As Object
+Set DCARIDATA = Sheet4
+Sheet7.Range("Q7").Value = "Nama"
+Sheet7.Range("Q8").Value = "*" & Me.TXTCARI.Value & "*"
+DCARIDATA.Range("A7").CurrentRegion.AdvancedFilter Action:=xlFilterCopy, CriteriaRange:= _
+Sheet7.Range("Q7:Q8"), CopyToRange:=Sheet7.Range("A7:O7"), Unique:=False
+irow = Sheet7.Range("A" & Rows.Count).End(xlUp).Row
+If Application.WorksheetFunction.CountA(Sheet7.Range("A8:A100000")) = 0 Then
+Me.TABELDATA.RowSource = ""
+Call MsgBox("Data tidak ditemukan", vbInformation, "Cari Data")
+Else
+Me.TABELDATA.RowSource = "HASILCARI!A8:O" & irow
+End If
+Exit Sub
+Salah:
+Call MsgBox("Maaf Data tidak ditemukan", vbInformation, "Cari Data")
+
+End Sub
+Private Sub AmbilLayanan()
+Dim DPENJUALAN As Long
+Dim irow As Long
+irow = Sheet5.Range("B" & Rows.Count).End(xlUp).Row
+DPENJUALAN = Application.WorksheetFunction.CountA(Sheet5.Range("B8:B100000"))
+If DPENJUALAN = 0 Then
+FORMDATABASE.CMBLAYANAN.RowSource = ""
+Else
+FORMDATABASE.CMBLAYANAN.RowSource = "PENGATURAN!B8:B" & irow
+End If
+End Sub
+Private Sub AmbilSales()
+Dim DPENJUALAN As Long
+Dim irow As Long
+irow = Sheet8.Range("B" & Rows.Count).End(xlUp).Row
+DPENJUALAN = Application.WorksheetFunction.CountA(Sheet8.Range("B3:B10000"))
+If DPENJUALAN = 0 Then
+FORMDATABASE.CMBSALES.RowSource = ""
+Else
+FORMDATABASE.CMBSALES.RowSource = "SALES!B8:B" & irow
+End If
+End Sub
+
+
+Private Sub TXTNAMA_Change()
+On Error GoTo EXCELVBA
+Dim CARIPERORANGAN As Object
+Dim CARIPERUSAHAAN As Object
+
+Set CARIPERUSAHAAN = Sheet3.Range("B8:B100000").Find(WHAT:=Me.TXTNAMA.Value, LookIn:=xlValues)
+Set CARIPERORANGAN = Sheet2.Range("B8:B100000").Find(WHAT:=Me.TXTNAMA.Value, LookIn:=xlValues)
+
+If Me.CBCUSTOMER.Value = "Perorangan" Then
+Me.TXTNOHP.Value = CARIPERORANGAN.Offset(0, 2).Value
+Me.TXTALAMAT.Value = CARIPERORANGAN.Offset(0, 3).Value
+End If
+
+If Me.CBCUSTOMER.Value = "Perusahaan" Then
+Me.TXTNOHP.Value = CARIPERUSAHAAN.Offset(0, 1).Value
+Me.TXTALAMAT.Value = CARIPERUSAHAAN.Offset(0, 4).Value
+
+End If
+Exit Sub
+EXCELVBA:
+Call MsgBox("Data tidak ditemukan", vbInformation, "Cari Data")
+
+End Sub
+
+Private Sub UserForm_Initialize()
+Me.BackColor = RGB(228, 233, 243)
+Call AmbilTanggal
+Call AmbilBulan
+Call AmbilTahun
+Call AmbilData
+Call AmbilLayanan
+Call AmbilSales
+
+With CMBSTATUS
+.AddItem "Diam"
+.AddItem "Menolak"
+.AddItem "Deal"
+.AddItem "Follow Up"
+End With
+With CBCUSTOMER
+.AddItem "Perorangan"
+.AddItem "Perusahaan"
+End With
+
+End Sub

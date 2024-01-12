@@ -1,0 +1,105 @@
+--------------------------------------
+FORM PRODUK : EXCEL & VBA TUTORIAL
+--------------------------------------
+
+Option Explicit
+
+Private Sub CMDADD_Click()
+'Perintah membuat nama tempat simpan data
+Dim DBPERORANGAN As Object
+'Perintah menentukan tempat simpan data
+Set DBPERORANGAN = Sheet5.Range("A800000").End(xlUp)
+'Perintah menentukan data yang wajib diisi
+If Me.TXTNAMAPRODUK.Value = "" _
+Or Me.TXTHARGAMIN.Value = "" Then
+
+'Perintah membuat pesan jika data kosong
+Call MsgBox("Harap isi data dengan lengkap", vbInformation, "Input Data")
+'Perintah menyimpan data jika data diisi lengkap
+Else
+DBPERORANGAN.Offset(1, 0).Value = "=ROW()-ROW($A$7)"
+DBPERORANGAN.Offset(1, 1).Value = Me.TXTNAMAPRODUK.Value
+DBPERORANGAN.Offset(1, 2).Value = Me.TXTHARGAMIN.Value
+
+Call AmbilData
+Call MsgBox("Data berhasil disimpan", vbInformation, "Input Data")
+
+'Perintah membersihkan Form setelah data berhasil disimpan
+Me.TXTNAMAPRODUK.Value = ""
+Me.TXTHARGAMIN.Value = ""
+
+End If
+
+End Sub
+
+Private Sub CMDDELETE_Click()
+Application.ScreenUpdating = False
+Dim HapusData As Object
+Set HapusData = Sheet5.Range("A6:A100000").Find(WHAT:=Me.TXTNOMOR.Value, LookIn:=xlValues)
+
+If Me.TXTNOMOR.Value = "" Then
+Call MsgBox("Pilih data pada tabel data", vbInformation, "Hapus Data")
+Else
+'Membuat pesan konfirmasi hapus data
+Select Case MsgBox("Anda akan menghapus data" _
+& vbCrLf & "Apakah anda yakin?" _
+, vbYesNo Or vbQuestion Or vbDefaultButton1, "Hapus data")
+Case vbNo
+Exit Sub
+Case vbYes
+End Select
+Me.TABELDATA.Value = ""
+Sheet2.Select
+Selection.EntireRow.Delete
+Me.TXTNOMOR.Value = ""
+Call AmbilData
+Call MsgBox("Data berhasil dihapus", vbInformation, "Hapus Data")
+Me.CMDADD.Enabled = True
+Me.TXTNAMAPRODUK.Value = ""
+Me.TXTHARGAMIN.Value = ""
+
+End If
+
+End Sub
+
+
+Private Sub TABELDATA_DblClick(ByVal Cancel As MSForms.ReturnBoolean)
+On Error GoTo EXCELVBA
+Application.ScreenUpdating = False
+
+Dim SUMBERUBAH, CELLAKTIF As String
+Me.TXTNOMOR.Value = Me.TABELDATA.Value
+Me.TXTNAMAPRODUK.Value = Me.TABELDATA.Column(1)
+Me.TXTHARGAMIN.Value = Me.TABELDATA.Column(2)
+
+Me.CMDADD.Enabled = False
+
+Sheet5.Select
+SUMBERUBAH = Sheets("PENGATURAN").Cells(Rows.Count, "A").End(xlUp).Row
+Sheets("PENGATURAN").Range("A8:A" & SUMBERUBAH).Find(WHAT:=Me.TXTNOMOR.Value, LookIn:=xlValues, LookAt:=xlWhole).Activate
+CELLAKTIF = ActiveCell.Row
+Sheet1.Select
+Exit Sub
+EXCELVBA:
+Call MsgBox("Harap pilih data pada tabel data", vbInformation, "Pilih Data")
+
+End Sub
+
+Private Sub AmbilData()
+Dim DBSUPPLIER As Long
+Dim irow As Long
+irow = Sheet5.Range("A" & Rows.Count).End(xlUp).Row
+DBSUPPLIER = Application.WorksheetFunction.CountA(Sheet5.Range("A8:A100000"))
+If DBSUPPLIER = 0 Then
+FORMPRODUCT.TABELDATA.RowSource = ""
+Else
+FORMPRODUCT.TABELDATA.RowSource = "PENGATURAN!A8:C" & irow
+End If
+End Sub
+
+
+Private Sub UserForm_Initialize()
+Call AmbilData
+End Sub
+
+

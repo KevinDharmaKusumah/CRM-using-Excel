@@ -1,0 +1,36 @@
+--------------------------------------
+MODUL MENU : EXCEL & VBA TUTORIAL
+--------------------------------------
+Option Explicit
+
+Sub BukaPeople()
+FORMPEOPLE.Show
+End Sub
+Sub BukaCompanies()
+FORMCOMPANIES.Show
+End Sub
+Sub BukaProduk()
+FORMPRODUCT.Show
+End Sub
+Sub BukaDatabase()
+FORMDATABASE.Show
+End Sub
+Sub BukaSales()
+FORMSALES.Show
+End Sub
+Sub simpan()
+ThisWorkbook.Save
+End Sub
+Sub Keluar()
+Select Case MsgBox("Anda akan keluar dari Aplikasikasi" _
+& vbCrLf & "Apakah anda yakin?" _
+, vbYesNo Or vbQuestion Or vbDefaultButton1, "Keluar")
+Case vbNo
+Exit Sub
+Case vbYes
+End Select
+ThisWorkbook.Save
+ThisWorkbook.Close
+End Sub
+
+
